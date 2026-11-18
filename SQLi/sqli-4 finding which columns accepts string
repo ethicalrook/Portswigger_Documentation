@@ -1,0 +1,58 @@
+# Lab: SQL Injection UNION Attack – Finding a Column Containing Text
+
+**Platform:** PortSwigger Web Security Academy
+
+## Objective
+Identify which column in the SQL query accepts text values and use it to retrieve the required string.
+
+## Analysis & Approach
+
+### 1. Finding the Number of Columns
+
+First, I used the `ORDER BY` method to determine the number of columns.
+
+Payload:
+```sql
+ORDER BY 4--
+```
+
+**Observation:** The application returned a 500 Internal Server Error.
+
+This indicated that the fourth column was invalid, meaning the query had 3 columns.
+
+### 2. Identifying the Column That Accepts Text
+
+Next, I tested each column using the `UNION SELECT` statement by placing the string `'ABC'` in different positions.
+
+**First attempt:**
+```sql
+' UNION SELECT 'ABC',NULL,NULL--
+```
+**Result:** 500 Internal Server Error.
+
+**Second attempt:**
+```sql
+' UNION SELECT NULL,'ABC',NULL--
+```
+**Result:** 200 OK.
+
+This confirmed that the **second column accepts text values**.
+
+### 3. Retrieving the Required String
+
+The lab required retrieving the following string:
+
+```text
+Jc1bFu
+```
+
+Since the second column accepted text, it could be used to display the required string through the UNION query.
+
+**Lab Status:** Solved.
+
+## Key Learnings
+
+- `ORDER BY` helps identify the number of columns.
+- `UNION SELECT` can be used to test which columns accept text.
+- Placing a string in different column positions helps identify compatible columns.
+- Once the correct column is identified, it can be used to retrieve text from the database.
